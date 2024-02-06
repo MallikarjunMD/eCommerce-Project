@@ -16,4 +16,11 @@ app.use("/api/v1/users",userRouter);
 
 app.use("/api/v1/products",productRouter);
 
+//not found route
+app.all("*",(req,res)=>{
+res.status(404).json({
+    message:`path ${req.originalUrl} not found`
+})
+})
+
 export default app;

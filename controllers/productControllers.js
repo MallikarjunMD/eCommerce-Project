@@ -71,15 +71,27 @@ export const getProducts=async (req,res)=>{
         const limit=req.query.limit?parseInt(req.query.limit):3
 
         let startIndex=(page-1)*limit
-        let endIndex=limit
+        let endIndex=page*limit
         productQuery=productQuery.skip(startIndex).limit(endIndex)
+
+        //defining previous and next pages
+        let noOfDocuments=await Product.countDocuments()
+        let pagination={}
+        if(startIndex>0){
+            pagination.previous=page-1
+        }
+        if(endIndex<noOfDocuments){
+            pagination.next=page+1
+        }
+
         //getting results by resolving query
         let products=await productQuery;
         res.status(200).json({
             status:"success",
             message:"products fetched successfully",
             products,
-            count:products.length
+            count:products.length,
+            pagination
         })
     } catch (error) {
         res.status(500).json({
