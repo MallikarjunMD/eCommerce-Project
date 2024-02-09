@@ -1,42 +1,61 @@
+import expressAsyncHandler from "express-async-handler";
 import Product from "../models/Product.js";
+import Category from "../models/Category.js";
+import Brand from "../models/Brand.js";
 
 //@desc     Create Product
 //@path     /api/v1/products
 //@access   Private/Admin
 
-export const createProduct=async (req,res)=>{
-
-    try {
+export const createProduct=expressAsyncHandler(async (req,res)=>{
         const {name,description,brand,category,sizes,colors,price,totalQty}=req.body
         const existingProduct=await Product.findOne({name:name})
         if(existingProduct){
-            return res.json({
-                message:"product exists already try adding new one"
-            })
+            // return res.json({
+            //     message:"product exists already try adding new one"
+            // })
+
+            //or
+
+            throw new Error('product exists already')            
+
         }
-        const product=await Product.create({
+        //check whether  the category exists or not
+        const categoryFound=await Category.findOne({name:category})
+        if(!categoryFound){
+            throw new Error("category not found, please first check category name")
+        }
+        //check whether  the brand exists or not
+        const brandFound=await Brand.findOne({name:brand})
+        if(!brandFound){
+            throw new Error("brand not found, please first check brand name")
+        }
+        const newProduct=await Product.create({
             name,description,brand,category,sizes,colors,price,totalQty,user:req.userId
         })
+         //push product into a brand
+        brandFound.products.push(newProduct._id)
+       //resave
+        await brandFound.save()
+        //push product into a category
+        categoryFound.products.push(newProduct._id)
+       //resave
+        await categoryFound.save()
         res.status(201).json({
             status:"success",
             message:"product created",
-            product
+            newProduct
         })
     
-    } catch (error) {
-        res.status(500).json({
-            status:"fail",
-            message:error.message
-        })
-    }
-}
+    
+})
 
 //@desc     get Products
 //@path     /api/v1/products
 //@access   Public/admin
 
-export const getProducts=async (req,res)=>{
-    try {
+export const getProducts=expressAsyncHandler(async (req,res)=>{
+    
         //query object
         let productQuery=Product.find()
         //based on name
@@ -93,73 +112,49 @@ export const getProducts=async (req,res)=>{
             count:products.length,
             pagination
         })
-    } catch (error) {
-        res.status(500).json({
-            status:"fail",
-            message:error.message
-
-        })
-    }
-}
+    
+})
 
 //@desc     get Product
 //@path     /api/v1/products/:id
 //@access   Public/admin
 
-export const getProduct=async (req,res)=>{
-    try {
+export const getProduct=expressAsyncHandler(async (req,res)=>{
+    
         const product=await Product.findById(req.params.id)
         res.status(200).json({
             status:"success",
             message:"product fetched successfully",
             product
         })
-    } catch (error) {
-        res.status(500).json({
-            status:"fail",
-            message:error.message
-
-        })
-    }
-}
+    
+})
 
 //@desc     update Product
 //@path     /api/v1/products/:id
 //@access   admin
 
-export const updateProduct=async (req,res)=>{
-    try {
+export const updateProduct=expressAsyncHandler(async (req,res)=>{
+    
         const updatedProduct=await Product.findByIdAndUpdate(req.params.id,req.body,{new:true,runValidators:true})
         res.status(200).json({
             status:"success",
             message:"product updated successfully",
             updatedProduct
         })
-    } catch (error) {
-        res.status(500).json({
-            status:"fail",
-            message:error.message
-
-        })
-    }
-}
+    
+})
 
 //@desc     delete Product
 //@path     /api/v1/products/:id
 //@access   admin
 
-export const deleteProduct=async (req,res)=>{
-    try {
+export const deleteProduct=expressAsyncHandler(async (req,res)=>{
+    
         await Product.findByIdAndDelete(req.params.id)
         res.status(200).json({
             status:"success",
             message:"product deleted successfully"
         })
-    } catch (error) {
-        res.status(500).json({
-            status:"fail",
-            message:error.message
-
-        })
-    }
-}
+    
+})
