@@ -9,6 +9,7 @@ import Brand from "../models/Brand.js";
 
 export const createProduct=expressAsyncHandler(async (req,res)=>{
         const {name,description,brand,category,sizes,colors,price,totalQty}=req.body
+        //check for existing product
         const existingProduct=await Product.findOne({name:name})
         if(existingProduct){
             // return res.json({
@@ -23,12 +24,12 @@ export const createProduct=expressAsyncHandler(async (req,res)=>{
         //check whether  the category exists or not
         const categoryFound=await Category.findOne({name:category})
         if(!categoryFound){
-            throw new Error("category not found, please first check category name")
+            throw new Error("category not found, please first check category name or create category")
         }
         //check whether  the brand exists or not
         const brandFound=await Brand.findOne({name:brand})
         if(!brandFound){
-            throw new Error("brand not found, please first check brand name")
+            throw new Error("brand not found, please first check brand name or create brand")
         }
         const newProduct=await Product.create({
             name,description,brand,category,sizes,colors,price,totalQty,user:req.userId
