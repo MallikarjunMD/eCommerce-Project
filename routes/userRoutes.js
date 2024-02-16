@@ -1,5 +1,5 @@
 import express from "express";
-import { getProfile, loginUser, registerUser } from "../controllers/userControllers.js";
+import { getProfile, loginUser, registerUser, updateShippingAddress } from "../controllers/userControllers.js";
 import { isLoggedIn } from "../middlewares/isLoggedIn.js";
 
 //router instance
@@ -11,5 +11,7 @@ userRouter.post("/register",registerUser)
 userRouter.post("/login",loginUser)
 //    /api/v1/users/profile
 userRouter.get("/profile",isLoggedIn,getProfile)
+
+userRouter.put("/update/shipping-address",isLoggedIn,updateShippingAddress)
 
 export default userRouter;
