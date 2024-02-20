@@ -41,6 +41,7 @@ export const registerUser=expressAsyncHandler(async (req,res)=>{
 export const loginUser=expressAsyncHandler(async (req,res)=>{
         const {email,password}=req.body;
         const existingUser=await User.findOne({email:email})
+        
         if(!existingUser ||(!(await existingUser.verifyPwd(password,existingUser.password)))){
             // return res.json({
             //     message:"user name or password do not match"

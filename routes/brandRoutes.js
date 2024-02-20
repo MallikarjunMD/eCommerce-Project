@@ -8,13 +8,14 @@ import {
   updateBrand,
 } from "../controllers/brandControllers.js";
 import { isLoggedIn } from "../middlewares/isLoggedIn.js";
+import isAdmin from "../middlewares/isAdmin.js";
 
 let brandRouter = express.Router();
 
-brandRouter.post("/", isLoggedIn, createBrand);
+brandRouter.post("/", isLoggedIn,isAdmin, createBrand);
 brandRouter.get("/", getBrands);
 brandRouter.get("/:id", getBrand);
-brandRouter.put("/:id", isLoggedIn, updateBrand);
-brandRouter.delete("/:id", isLoggedIn, deleteBrand);
+brandRouter.put("/:id", isLoggedIn,isAdmin, updateBrand);
+brandRouter.delete("/:id", isLoggedIn,isAdmin, deleteBrand);
 
 export default brandRouter;

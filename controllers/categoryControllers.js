@@ -13,6 +13,7 @@ export const createCategory = expressAsyncHandler(async (req, res) => {
   }
   const category = await Category.create({
     name: name.toLowerCase(),
+    image:req.file.path,
     user: req.userId,
   });
 
@@ -42,7 +43,7 @@ export const getCategories = expressAsyncHandler(async (req, res) => {
 
 export const getCategory = expressAsyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
-  res.json({
+  res.status(201).json({
     status: 'Success',
     message: 'Fetched category successfully',
     category,
@@ -54,17 +55,15 @@ export const getCategory = expressAsyncHandler(async (req, res) => {
 // @access Private/Admin
 
 export const updateCategory = expressAsyncHandler(async (req, res) => {
-  const category = await Category.findByIdAndUpdate(
+  const updatedCategory = await Category.findByIdAndUpdate(
     req.params.id,
-    {
-      name: req.body.name,
-    },
-    { new: true }
+      req.body,
+    { new: true, runValidators:true }
   );
-  res.json({
+  res.status(200).json({
     status: 'Success',
     message: 'Updated category successfully',
-    category,
+    updatedCategory,
   });
 });
 
@@ -74,7 +73,7 @@ export const updateCategory = expressAsyncHandler(async (req, res) => {
 
 export const deleteCategory = expressAsyncHandler(async (req, res) => {
   await Category.findByIdAndDelete(req.params.id);
-  res.json({
+  res.status(200).json({
     status: 'Success',
     message: 'Deleted category successfully',
   });

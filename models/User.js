@@ -73,6 +73,7 @@ userSchema.pre("save",async function(){
 })
 
 userSchema.methods.verifyPwd=async function(pwd,pwdDB){
+  
   return await bcrypt.compare(pwd,pwdDB)
 }
 
